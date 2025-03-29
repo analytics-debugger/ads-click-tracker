@@ -95,7 +95,10 @@ tracker.clear()
 ### Initialization
 
 ```typescript
-AdsClickTracker(options: TrackerOptions): AdsClickTracker
+class AdsClickTracker {
+  constructor(options: TrackerOptions)
+  // ... other methods
+}
 ```
 
 #### TrackerOptions

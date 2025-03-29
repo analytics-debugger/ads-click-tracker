@@ -5,6 +5,7 @@ export default antfu(
   {
     ignores: [
       'pnpm-workspace.yaml',
+      'README.md',
     ],
     type: 'lib',
     pnpm: true,
