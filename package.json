@@ -1,9 +1,9 @@
 {
-  "name": "ads-click-tracker",
+  "name": "@analytics-debugger/ads-click-tracker",
   "type": "module",
   "version": "0.0.1-beta.1",
   "packageManager": "pnpm@10.6.2",
-  "description": "_description_",
+  "description": "Library to keep track of clickIds from different advertising platforms",
   "author": "David Vallejo <thyngster@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/thyngster",
