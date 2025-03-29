@@ -2,7 +2,7 @@
 
 interface ClickConfig {
   name: string
-  expirationMs?: number
+  ttl?: number
   maxClicks?: number
 }
 
@@ -42,8 +42,8 @@ class AdsClickTracker {
     }
 
     // Initialize configurations
-    options.clickIdConfigs.forEach(({ name, expirationMs = 2592000000, maxClicks = 100 }) => {
-      this.configs.set(name, { expires: expirationMs, max: maxClicks })
+    options.clickIdConfigs.forEach(({ name, ttl = 2592000000, maxClicks = 100 }) => {
+      this.configs.set(name, { expires: ttl, max: maxClicks })
       this.clicks[name] = this.clicks[name] || []
     })
 
