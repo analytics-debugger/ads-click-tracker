@@ -2,7 +2,7 @@
 
 interface ClickConfig {
   name: string
-  expirationMs?: number
+  ttl?: number
   maxClicks?: number
 }
 
@@ -12,6 +12,11 @@ interface TrackerOptions {
   debug?: boolean
   checkHash?: boolean
   decodeValues?: boolean
+  callbacks?: {
+    onLoaded?: (clicks: Record<string, ClickData | ClickData[]>) => void
+    onNewClickId?: (click: ClickData) => void
+    onUpdatedClickId?: (click: ClickData) => void
+  }
 }
 
 interface ClickData {
@@ -37,12 +42,15 @@ class AdsClickTracker {
     }
 
     // Initialize configurations
-    options.clickIdConfigs.forEach(({ name, expirationMs = 2592000000, maxClicks = 100 }) => {
-      this.configs.set(name, { expires: expirationMs, max: maxClicks })
+    options.clickIdConfigs.forEach(({ name, ttl = 2592000000, maxClicks = 100 }) => {
+      this.configs.set(name, { expires: ttl, max: maxClicks })
       this.clicks[name] = this.clicks[name] || []
     })
 
     this.load()
+    if (typeof this.options.callbacks?.onLoaded === 'function') {
+      this.options.callbacks.onLoaded(this.get(true))
+    }
     this.checkUrl()
   }
 
@@ -121,30 +129,31 @@ class AdsClickTracker {
     const now = Date.now()
     const landing = typeof window !== 'undefined' ? window.location.href : ''
     const referrer = typeof document !== 'undefined' ? document.referrer : ''
-    // Initialize array if not exists
-    if (!Array.isArray(this.clicks[source])) {
-      this.clicks[source] = []
+
+    // Create click data object once
+    const clickData = {
+      value,
+      timestamp: now,
+      expiresAt: now + expiresMs,
+      landing,
+      referrer,
     }
+
+    // Initialize array if not exists
+    this.clicks[source] = this.clicks[source] || []
 
     // Update existing or add new
     const existingIndex = this.clicks[source].findIndex(c => c.value === value)
+
     if (existingIndex >= 0) {
-      this.clicks[source][existingIndex] = {
-        value,
-        timestamp: now,
-        expiresAt: now + expiresMs,
-        landing,
-        referrer,
-      }
+      this.clicks[source][existingIndex] = clickData
+      typeof this.options.callbacks?.onUpdatedClickId === 'function'
+      && this.options.callbacks.onUpdatedClickId(clickData)
     }
     else {
-      this.clicks[source].push({
-        value,
-        timestamp: now,
-        expiresAt: now + expiresMs,
-        landing,
-        referrer,
-      })
+      this.clicks[source].push(clickData)
+      typeof this.options.callbacks?.onNewClickId === 'function'
+      && this.options.callbacks.onNewClickId(clickData)
     }
 
     this.save()
@@ -156,16 +165,34 @@ class AdsClickTracker {
     this.recordClick(source, value, config.expires)
   }
 
-  get(source?: string): ClickData[] {
-    const now = Date.now()
-    if (source) {
-      return Array.isArray(this.clicks[source])
-        ? this.clicks[source].filter(c => c && c.expiresAt > now)
-        : []
+  get(latest?: boolean): Record<string, ClickData[]> {
+    // If latest is false or not provided, return all clicks
+    if (!latest || latest !== true) {
+      return this.clicks
     }
-    return Object.values(this.clicks)
-      .flat()
-      .filter(c => c && c.expiresAt > now)
+
+    // Helper function to get the latest click
+    const getLatestClick = (clicks: ClickData[] = []): ClickData[] => {
+      if (!clicks.length)
+        return []
+
+      const latest = clicks.reduce((newest, current) =>
+        current.timestamp > newest.timestamp ? current : newest, clicks[0])
+
+      return [latest]
+    }
+
+    // If latest is true, return object with arrays containing single items or empty arrays
+    const result: Record<string, ClickData[]> = {}
+
+    // Process all sources and ensure they all exist in the result
+    const allSources = Array.from(this.configs.keys())
+
+    allSources.forEach((sourceName) => {
+      result[sourceName] = getLatestClick(this.clicks[sourceName])
+    })
+
+    return result
   }
 
   clear(source?: string): void {
