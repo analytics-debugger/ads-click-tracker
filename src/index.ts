@@ -49,9 +49,7 @@ class AdsClickTracker {
 
     this.load()
     if (typeof this.options.callbacks?.onLoaded === 'function') {
-      const latest = true
-      const clickData = this.get('fbclid', latest)
-      this.options.callbacks.onLoaded(clickData)
+      this.options.callbacks.onLoaded(this.get(true))
     }
     this.checkUrl()
   }
@@ -167,36 +165,34 @@ class AdsClickTracker {
     this.recordClick(source, value, config.expires)
   }
 
-  get(source?: string, latest?: boolean): Record<string, ClickData[] | [ClickData | null]> {
-    // If latest is false, return all clicks
-    if (!latest) {
-      if (source && this.clicks[source]) {
-        return { [source]: this.clicks[source] }
-      }
+  get(latest?: boolean): Record<string, ClickData[]> {
+    // If latest is false or not provided, return all clicks
+    if (!latest || latest !== true) {
       return this.clicks
     }
 
     // Helper function to get the latest click
-    const getLatestClick = (clicks: ClickData[]): ClickData | null => {
-      if (!clicks || !clicks.length)
-        return null
-      return clicks.reduce((newest, current) =>
+    const getLatestClick = (clicks: ClickData[] = []): ClickData[] => {
+      if (!clicks.length)
+        return []
+
+      const latest = clicks.reduce((newest, current) =>
         current.timestamp > newest.timestamp ? current : newest, clicks[0])
+
+      return [latest]
     }
 
-    // If latest is true, return object with arrays containing single items
-    if (source) {
-      // Return object with array containing the latest click for the specific source
-      const latestClick = getLatestClick(this.clicks[source] || [])
-      return { [source]: [latestClick] }
-    }
-    else {
-      // Return object with arrays containing the latest click for each source
-      return Object.entries(this.clicks).reduce((result, [sourceName, clicks]) => {
-        result[sourceName] = [getLatestClick(clicks)]
-        return result
-      }, {} as Record<string, [ClickData | null]>)
-    }
+    // If latest is true, return object with arrays containing single items or empty arrays
+    const result: Record<string, ClickData[]> = {}
+
+    // Process all sources and ensure they all exist in the result
+    const allSources = Array.from(this.configs.keys())
+
+    allSources.forEach((sourceName) => {
+      result[sourceName] = getLatestClick(this.clicks[sourceName])
+    })
+
+    return result
   }
 
   clear(source?: string): void {
