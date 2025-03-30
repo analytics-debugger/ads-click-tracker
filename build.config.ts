@@ -12,13 +12,13 @@ function commonHook(options, minified = false) {
   // Determine new filename based on build configuration
   let newFilename
   if (options.rollup?.output?.format === 'esm') {
-    newFilename = minified ? 'AdsClickTracker.esm.min.mjs' : 'AdsClickTracker.esm.mjs'
+    newFilename = minified ? 'index.esm.min.mjs' : 'index.esm.mjs'
   }
   else if (options.rollup?.output?.format === 'iife') {
-    newFilename = minified ? 'AdsClickTracker.iife.min.js' : 'AdsClickTracker.iife.js'
+    newFilename = minified ? 'index.iife.min.js' : 'index.iife.js'
   }
   else if (options.rollup?.output?.format === 'umd') {
-    newFilename = minified ? 'AdsClickTracker.umd.min.js' : 'AdsClickTracker.umd.js'
+    newFilename = minified ? 'index.umd.min.js' : 'index.umd.js'
   }
   else {
     newFilename = 'index.mjs'
