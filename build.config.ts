@@ -12,7 +12,7 @@ function commonHook(options, minified = false) {
   // Determine new filename based on build configuration
   let newFilename
   if (options.rollup?.output?.format === 'esm') {
-    newFilename = minified ? 'AdsClickTracker.esm.min.js' : 'AdsClickTracker.esm.js'
+    newFilename = minified ? 'AdsClickTracker.esm.min.mjs' : 'AdsClickTracker.esm.mjs'
   }
   else if (options.rollup?.output?.format === 'iife') {
     newFilename = minified ? 'AdsClickTracker.iife.min.js' : 'AdsClickTracker.iife.js'

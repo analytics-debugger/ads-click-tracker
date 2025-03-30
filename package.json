@@ -1,7 +1,7 @@
 {
   "name": "@analytics-debugger/ads-click-tracker",
   "type": "module",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "packageManager": "pnpm@10.6.2",
   "description": "Library to keep track of clickIds from different advertising platforms",
   "author": "David Vallejo <thyngster@gmail.com>",
@@ -16,11 +16,11 @@
   "keywords": [],
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/AdsClickTracker.esm.mjs",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/AdsClickTracker.esm.mjs",
+  "module": "./dist/AdsClickTracker.esm.mjs",
   "types": "./dist/index.d.mts",
   "files": [
     "dist"
