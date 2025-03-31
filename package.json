@@ -17,14 +17,12 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.esm.mjs",
-      "require": "./dist/index.umd.js",
-      "browser": "./dist/index.iife.js"
-    },
-    "./package.json": "./package.json"
+      "import": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    }
   },
-  "main": "./dist/index.esm.mjs",
-  "module": "./dist/index.esm.mjs",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "files": [
     "dist"
@@ -46,6 +44,7 @@
     "@antfu/eslint-config": "catalog:cli",
     "@antfu/ni": "catalog:cli",
     "@antfu/utils": "catalog:inlined",
+    "@rollup/plugin-terser": "catalog:",
     "@types/node": "catalog:types",
     "bumpp": "catalog:cli",
     "eslint": "catalog:cli",
@@ -66,4 +65,5 @@
   "lint-staged": {
     "*": "eslint --fix"
   }
+
 }
